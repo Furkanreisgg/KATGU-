@@ -63,7 +63,7 @@ CombatSection:AddButton({
 
            for i, v in pairs(Players:GetPlayers()) do
                if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                   local DistanceFromPlayer = (LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+                   local DistanceFromPlayer = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - v.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
 
                    if DistanceFromPlayer < FarthestDistance then
                        FarthestDistance = DistanceFromPlayer
@@ -86,7 +86,7 @@ CombatSection:AddButton({
            if tostring(NamecallMethod) == "FindPartOnRayWithIgnoreList" then
                local ClosestPlayer = GetClosestPlayer()
                
-               if ClosestPlayer and ClosestPlayer.Character then
+               if ClosestPlayer and ClosestPlayer.Character and ClosestPlayer.Character:FindFirstChild("Head") then
                    Arguments[1] = Ray.new(Camera.CFrame.Position, (ClosestPlayer.Character.Head.Position - Camera.CFrame.Position).Unit * (Camera.CFrame.Position - ClosestPlayer.Character.Head.Position).Magnitude)
                end
            end
