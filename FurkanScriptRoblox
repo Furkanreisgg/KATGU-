@@ -1,0 +1,199 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+OrionLib:MakeNotification({
+	Name = "FurkanHub",
+	Content = "Welcome to my hub",
+	Image = "rbxassetid://4483345998",
+	Time = 5
+})
+
+local Window = OrionLib:MakeWindow({Name = "Furkanscript", HidePremium = false, SaveConfig = true, ConfigFolder = "Orion"})
+
+--Player Tab--
+
+local PlayerTab = Window:MakeTab({
+	Name = "Player",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local PlayerSection = PlayerTab:AddSection({
+	Name = "Player"
+})
+
+PlayerSection:AddSlider({
+	Name = "Walkspeed",
+	Min = 16,
+	Max = 100,
+	Default = 5,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	ValueName = "Walkspeed",
+	Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+	end    
+})
+
+--Player Tab End--
+
+--Combat Tab--
+
+local CombatTab = Window:MakeTab({
+	Name = "Combat",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local CombatSection = CombatTab:AddSection({
+	Name = "Combat"
+})
+
+CombatSection:AddButton({
+	Name = "Activate Silent Aim",
+	Callback = function()
+		local Camera = game:GetService("Workspace").CurrentCamera
+		local Players = game:GetService("Players")
+		local LocalPlayer = game:GetService("Players").LocalPlayer
+
+		local function GetClosestPlayer()
+		   local ClosestPlayer = nil
+		   local FarthestDistance = math.huge
+
+		   for i, v in pairs(Players.GetPlayers(Players)) do
+		       if v ~= LocalPlayer and v.Character and v.Character.FindFirstChild(v.Character, "HumanoidRootPart") then
+		           local DistanceFromPlayer = (LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
+
+		           if DistanceFromPlayer < FarthestDistance then
+		               FarthestDistance = DistanceFromPlayer
+		               ClosestPlayer = v
+		           end
+		       end
+		   end
+
+		   if ClosestPlayer then
+		       return ClosestPlayer
+		   end
+		end
+
+		local GameMetaTable = getrawmetatable(game)
+		local OldGameMetaTableNamecall = GameMetaTable.__namecall
+		setreadonly(GameMetaTable, false)
+
+		GameMetaTable.__namecall = newcclosure(function(object, ...)
+		   local NamecallMethod = getnamecallmethod()
+		   local Arguments = {...}
+
+		   if tostring(NamecallMethod) == "FindPartOnRayWithIgnoreList" then
+		       local ClosestPlayer = GetClosestPlayer()
+		       
+		       if ClosestPlayer and ClosestPlayer.Character then
+		           Arguments[1] = Ray.new(Camera.CFrame.Position, (ClosestPlayer.Character.Head.Position - Camera.CFrame.Position).Unit * (Camera.CFrame.Position - ClosestPlayer.Character.Head.Position).Magnitude)
+		       end
+		   end
+
+		   return OldGameMetaTableNamecall(object, unpack(Arguments))k
+		end)
+
+		setreadonly(GameMetaTable, true)
+	end    
+})
+
+--Combat Tab End--
+
+--ESP Tab--
+
+local ESPTab = Window:MakeTab({
+	Name = "ESP",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local ESPSection = ESPTab:AddSection({
+	Name = "ESP"
+})
+
+local outlineColor = Color3.new(1, 0, 0)  -- Varsayılan renk kırmızı
+
+local function CreateOutline(character)
+	for _, part in pairs(character:GetChildren()) do
+		if part:IsA("BasePart") then
+			local highlight = Instance.new("Highlight")
+			highlight.Parent = part
+			highlight.Adornee = part
+			highlight.FillColor = outlineColor
+			highlight.FillTransparency = 0.5
+			highlight.OutlineColor = outlineColor
+			highlight.OutlineTransparency = 0
+		end
+	end
+end
+
+local function ApplyOutlineToPlayer(player)
+	if player.Character then
+		CreateOutline(player.Character)
+	end
+	
+	player.CharacterAdded:Connect(function(character)
+		wait(0.1)  -- Kısa bir gecikme, karakterin tamamen yüklenmesini beklemek için
+		CreateOutline(character)
+	end)
+end
+
+ESPSection:AddButton({
+	Name = "Outline Everyone",
+	Callback = function()
+		for _, player in pairs(game.Players:GetPlayers()) do
+		    if player ~= game.Players.LocalPlayer then
+		        ApplyOutlineToPlayer(player)
+		    end
+		end
+		
+		game.Players.PlayerAdded:Connect(function(player)
+		    ApplyOutlineToPlayer(player)
+		end)
+	end
+})
+
+ESPSection:AddColorPicker({
+	Name = "Outline Color",
+	Default = outlineColor,
+	Callback = function(color)
+		outlineColor = color
+		for _, player in pairs(game.Players:GetPlayers()) do
+		    if player.Character then
+		        for _, part in pairs(player.Character:GetChildren()) do
+		            if part:IsA("BasePart") and part:FindFirstChildOfClass("Highlight") then
+		                local highlight = part:FindFirstChildOfClass("Highlight")
+		                highlight.FillColor = outlineColor
+		                highlight.OutlineColor = outlineColor
+		            end
+		        end
+		    end
+		end
+	end
+})
+
+--ESP Tab End--
+
+--Settings Tab--
+
+local SettingsTab = Window:MakeTab({
+	Name = "Settings",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local SettingsSection = SettingsTab:AddSection({
+	Name = "Settings"
+})
+
+SettingsSection:AddButton({
+	Name = "Destroy UI",
+	Callback = function()
+        OrionLib:Destroy()
+  	end    
+})
+
+--Settings End--
+
+OrionLib:Init() --UI Lib Endüstri 
