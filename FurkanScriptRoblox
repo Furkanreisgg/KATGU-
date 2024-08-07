@@ -61,7 +61,7 @@ CombatSection:AddButton({
            local ClosestPlayer = nil
            local FarthestDistance = math.huge
 
-           for i, v in pairs(Players:GetPlayers()) do
+           for _, v in pairs(Players:GetPlayers()) do
                if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
                    local DistanceFromPlayer = (LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position - v.Character:FindFirstChild("HumanoidRootPart").Position).Magnitude
 
@@ -87,7 +87,7 @@ CombatSection:AddButton({
                local ClosestPlayer = GetClosestPlayer()
                
                if ClosestPlayer and ClosestPlayer.Character and ClosestPlayer.Character:FindFirstChild("Head") then
-                   Arguments[1] = Ray.new(Camera.CFrame.Position, (ClosestPlayer.Character.Head.Position - Camera.CFrame.Position).Unit * (Camera.CFrame.Position - ClosestPlayer.Character.Head.Position).Magnitude)
+                   Arguments[1] = Ray.new(Camera.CFrame.Position, (ClosestPlayer.Character.Head.Position - Camera.CFrame.Position).Unit * 500)
                end
            end
 
