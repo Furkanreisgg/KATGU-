@@ -35,6 +35,9 @@ TextButton.TextSize = 14
 local key = "Leyla"
 local correctKey = false
 
+-- Arkadaşlar listesi
+local friends = {}
+
 -- Doğrulama butonu tıklandığında
 TextButton.MouseButton1Click:Connect(function()
     if TextBox.Text == key then
@@ -53,6 +56,39 @@ TextButton.MouseButton1Click:Connect(function()
         })
 
         local Window = OrionLib:MakeWindow({Name = "Furkanscript", HidePremium = false, SaveConfig = true, ConfigFolder = "Orion"})
+
+        -- Team Tab --
+        local TeamTab = Window:MakeTab({
+            Name = "Team",
+            Icon = "rbxassetid://4483345998",
+            PremiumOnly = false
+        })
+
+        local TeamSection = TeamTab:AddSection({
+            Name = "Select Friends"
+        })
+
+        -- Tüm oyuncuları listele ve seçileni arkadaş listesine ekle
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                TeamSection:AddToggle({
+                    Name = player.Name,
+                    Default = false,
+                    Callback = function(Value)
+                        if Value then
+                            table.insert(friends, player.Name)
+                        else
+                            for i, v in ipairs(friends) do
+                                if v == player.Name then
+                                    table.remove(friends, i)
+                                    break
+                                end
+                            end
+                        end
+                    end
+                })
+            end
+        end
 
         --Player Tab--
 
@@ -104,8 +140,8 @@ TextButton.MouseButton1Click:Connect(function()
                     local ClosestPlayer = nil
                     local FarthestDistance = math.huge
 
-                    for i, v in pairs(Players.GetPlayers(Players)) do
-                        if v ~= LocalPlayer and v.Character and v.Character.FindFirstChild(v.Character, "HumanoidRootPart") then
+                    for i, v in pairs(Players:GetPlayers()) do
+                        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and not table.find(friends, v.Name) then
                             local DistanceFromPlayer = (LocalPlayer.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
 
                             if DistanceFromPlayer < FarthestDistance then
@@ -233,8 +269,7 @@ TextButton.MouseButton1Click:Connect(function()
         })
 
         SettingsSection:AddButton({
-            Name = "Destroy UI",
-            Callback = function()
+            Name = "Destroy UI",Callback = function()
                 OrionLib:Destroy()
             end    
         })
